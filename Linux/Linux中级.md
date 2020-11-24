@@ -1,7 +1,9 @@
 # 代码
 
 ```
-date
+date 时间
+alias 别名
+
 vi /etc/motd 设置开机欢迎
 cat /etc/os-release 查看系统版本
 ```
@@ -190,7 +192,185 @@ su - 用户名 # 完全的环境变量用户切换
 若指定目录不存在则创建目录。
 
 -m, --mode=模式       设置权限模式(类似chmod)，而不是rwxrwxrwx 减umask
--p, --parents         需要时创建目标目录的上层目录，但即使这些目录已存在也不当作错误处理
+-p, --parents         递归创建文件夹，且绝对路径
 mkdir {1..3}加花括号创建连续的目录，用..隔开 花括号内可以是连续的数字、连续的字母mkdir {a..e}
 ```
+
+案例
+
+```
+mkdir -p /opt/alex/chaoge/xx/ll
+mkdir chaoge{1..100} #mkdir chaoge1 mkdir chaoge2 ... mkdir chaoge100 
+```
+
+### *touch命令*
+
+```
+用法：touch [选项]... 文件...
+将每个文件的访问时间和修改时间改为当前时间。
+
+touch有两个作用
+1.创建普通文件，在Linux下文件的后缀格式仅仅是一个名字而已，通过touch创建的都是普通文件
+2.修改文件时间
+
+不存在的文件将会被创建为空文件，除非使用-c 或-h 选项。
+
+touch {连续数字或字母} 创建多个文件序列
+touch {1..10}
+touch {a..z}
+
+  -c, --no-create       不创建任何文件
+  -t STAMP              使用[[CC]YY]MMDDhhmm[.ss] 格式的时间替代当前时间
+  touch -t 10240606 mjj.exe #10月24日06:06
+  -r, --reference=文件  使用指定文件的时间属性替代当前文件时间
+```
+
+### *cp复制*
+
+```
+用法：cp [选项]... [-T] 源文件 目标文件
+　或：cp [选项]... 源文件... 目录
+　或：cp [选项]... -t 目录 源文件...
+将源文件复制至目标文件，或将多个源文件复制至目标目录。
+
+-r 递归式复制目录，即复制目录下的所有层级的子目录及文件 -p 复制的时候 保持属性不变
+-d 复制的时候保持软连接不变(快捷方式)
+	#cp -d link_luffy link_luffy2
+-a 等于-pdr
+-p                等于--preserve=模式,所有权,时间戳，复制文件时保持源文件的权限、时间属性
+-i, --interactive        覆盖前询问提示
+	#cp 就是 cp -i
+```
+
+案例
+
+```
+案例1
+
+复制 > copy > cp
+#移动xxx.py到/tmp目录下
+cp xxx.py /tmp/
+#移动xxx.py顺便改名为chaoge.py
+cp xxx.py /tmp/chaoge.py
+
+Linux下面很多命令，一般没有办法直接处理文件夹,因此需要加上（参数） 
+cp -r 递归,复制目录以及目录的子孙后代
+cp -p 复制文件，同时保持文件属性不变    可以用stat
+cp -a 相当于-pdr
+
+#递归复制test文件夹，为test2
+cp -r test test2
+
+cp是个好命令，操作文件前，先备份
+cp main.py main.py.bak
+
+移动多个文件，放入文件夹c中
+cp -r  文件1  文件2  文件夹a   文件夹c
+
+[root@pylinux opt]# cp luffy_boy.zip  luffy_boy.zip.bak2
+cp：是否覆盖"luffy_boy.zip.bak2"？ y
+
+[root@pylinux opt]# cp luffy_boy.zip  luffy_boy.zip.bak2 -i
+cp：是否覆盖"luffy_boy.zip.bak2"？ y
+
+cp确认是否覆盖是-i参数作用，默认alias因为添加了别名
+[root@pylinux opt]# alias
+alias cp='cp -i'
+
+案例2
+
+[root@pylinux opt]# cp luffyCity/ luffyCity2    #必须添加-r参数才可以复制递归目录
+cp: omitting directory 'luffyCity/'
+[root@pylinux opt]#
+[root@pylinux opt]#
+[root@pylinux opt]#
+[root@pylinux opt]# cp -r luffyCity/ luffyCity2
+[root@pylinux opt]#
+[root@pylinux opt]#
+[root@pylinux opt]# ls
+luffyCity  luffyCity2
+```
+
+取消cp别名的方式
+
+- 使用命令绝对路径
+- 命令开头用反斜线 \
+- 取消cp命令别名
+- 写入环境变量配置文件
+
+```
+1.
+[root@pylinux opt]# which cp
+alias cp='cp -i'
+    /usr/bin/cp
+[root@pylinux opt]# /usr/bin/cp luffy_boy.zip luffy_boy.zip.bak
+
+2.
+[root@pylinux opt]# \cp luffy_boy.zip luffy_boy.zip.bak
+
+3.
+[root@pylinux opt]# unalias cp
+[root@pylinux opt]#
+[root@pylinux opt]# cp luffy_boy.zip luffy_boy.zip.bak
+
+4.
+[root@pylinux opt]# vim ~/.bashrc  #可以注释掉如下配置
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+#alias cp='cp -i'
+alias mv='mv -i'
+```
+
+快速备份配置文件
+
+![img](https://necqyee.oss-cn-guangzhou.aliyuncs.com/image/261.jpg)
+
+
+
+
+
+
+
+## 绝对路径与相对路径
+
+Linux下特别注意文件名/路径的写法，可以将所谓的路径(path)定义为绝对路径(absolute)和相对路径(relative)。这两种文件名/路径的写法依据是这样的：
+
+- 绝对路径：由根目录(/)为开始写起的文件名或者目录名称，如/home/oldboy/test.py;
+
+- 相对路径：相对于目前路径的文件名写法。例如./home/oldboy/exam.py或../../home/oldboy/exam.py，简单来说只要开头不是/，就是属于相对路径
+
+因此你必须了解，相对路径是：以你当前所在路径的相对路径来表示的。
+
+例如你现在在/home 这个目录下，如要进入/var/log这个路径，如何写呢？
+
+1. cd /var/log (绝对路径)
+2. cd ../var/log(相对路径)
+
+结果如图：
+
+因为你在/home底下，因此你要回到上一层(../)之后，才能继续前往/var，特别注意：
+
+- . :代表当前的目录，也可以用./ 来表示
+- .. :代表上一层的目录，也可以用../来表示
+
+![img](https://necqyee.oss-cn-guangzhou.aliyuncs.com/image/280.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
