@@ -644,7 +644,7 @@ $　　　　移动光标到本行结尾
 H　　　　移动光标到屏幕首行
 M　　　　移动到光标到屏幕的中间一行
 L　　　　移动光标到屏幕的尾行
-gg　　　 移动光标到文档的首行
+g　　　 移动光标到文档的首行
 G　　　　移动光标到文档尾行
 
 ctrl + f　　下一页
@@ -751,5 +751,123 @@ ctrl+v
 :set nonu 取消显示行号
 
 随时按下esc可以退出底线命令模式
+```
+
+### vim执行流程与常见故障解析
+
+*swp文件*
+
+![img](https://necqyee.oss-cn-guangzhou.aliyuncs.com/image/285.jpg)
+
+## 重定向符号
+
+|                 符号                 |            解释             |
+| :----------------------------------: | :-------------------------: |
+| 重定向的意思是，”将数据传到其他地方“ |                             |
+|               < 或者<<               |   标准输入stdin，代码为0    |
+|                >或>>                 |   标准输出stdout，代码为1   |
+|               2>或2>>                | 标准错误输出stderr，代码为2 |
+
+## cat命令
+
+|          功能          |                            说明                             |
+| :--------------------: | :---------------------------------------------------------: |
+|      查看文件内容      |                        cat file.txt                         |
+|      多个文件合并      |              cat file.txt file2.txt > file3.tx              |
+| 非交互式编辑或追加内容 |         cat >> file.txt << EOF 欢迎来到路飞学城 EOF         |
+|      清空文件内容      | cat /dev/null > file.txt 【/dev/null是linux系统的黑洞文件】 |
+
+参数
+
+```
+用法：cat [选项] [文件]...
+将[文件]或标准输入组合输出到标准输出。
+
+清空文件内容,慎用
+> 文件名
+
+
+-A, --show-all           等价于 -vET
+-b, --number-nonblank    对非空输出行编号
+-e                       等价于 -vE
+-E, --show-ends          在每行结束处显示 $
+-n, --number             对输出的所有行编号
+-s, --squeeze-blank      不输出多行空行
+-t                       与 -vT 等价
+-T, --show-tabs          将跳格字符显示为 ^I
+-u                       (被忽略)
+-v, --show-nonprinting   使用 ^ 和 M- 引用，除了 LFD 和 TAB 之外
+--help     显示此帮助信息并退出
+--version  输出版本信息并退出
+
+如果[文件]缺省，或者[文件]为 - ，则读取标准输入。
+```
+
+案例
+
+```
+#查看文件，显示行号
+cat -n xxx.py
+
+#猫,查看文件
+cat xxx.py
+
+#在每一行的结尾加上$符
+[root@master tmp]# cat -E 1.txt
+
+#追加文字到文件
+cat >>/tmp/oldboy.txt << EOF
+唧唧复唧唧
+木兰开飞机
+开的什么机
+波音747
+EOF
+
+[root@luffycity tmp]# cat -b file.txt            #输出非空行的编号
+     1    欢迎来到路飞学城
+     2    学生还有五分钟到达战场
+
+
+     3    全军出击
+[root@luffycity tmp]#
+[root@luffycity tmp]#
+[root@luffycity tmp]#
+[root@luffycity tmp]# cat -n file.txt        #输出所有行的编号
+     1    欢迎来到路飞学城
+     2    学生还有五分钟到达战场
+     3
+     4
+     5    全军出击
+
+
+
+[root@luffycity tmp]# cat -E file.txt        #显示出每行的结束符，$符号
+欢迎来到路飞学城$
+学生还有五分钟到达战场$
+$
+$
+全军出击$
+
+[root@luffycity tmp]# cat -s file.txt        # -s参数把多个空行，换成一个，可以让文件更精炼阅读
+欢迎来到路飞学城
+学生还有五分钟到达战场
+
+全军出击
+
+
+
+[root@luffycity tmp]# cat > alex.txt        #cat写入内容，用ctrl+c 结束，一般不用
+我是金角老妖怪alex
+^C
+
+1.直接清空文件，留下一个空行
+echp > gushi.txt
+
+2.直接清空，不留空行
+> gushi.txt
+
+3.利用cat读取一个黑洞文件，然后清空其它文本
+/dev/null #空设备，黑洞文件
+cat /dev/null > gu.txt
 ```
 
